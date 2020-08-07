@@ -2,8 +2,9 @@ const puppeteer = require('puppeteer');
 require('dotenv').config()
 
 async function run() {
-    const browser = getBrowserInstance();
     await login();
+    await secretResponse();
+    await goToTimePage();
 }
 
 async function getBrowserInstance() {
@@ -12,20 +13,22 @@ async function getBrowserInstance() {
     return this.browser;
 }
 
-async function login(){
+async function login() {
     const page = await navigateTo(process.env.BASE_URL);
     const user = process.env.USER;
     const pass = process.env.PASS;
     page.evaluate(
-      async (user, pass) => {
-        document.querySelector('[name="email"]').value = user;
-        document.querySelector('[name="password"]').value = pass;
-        document.querySelector("form").submit();
-      },
-      user,
-      pass
+        async (user, pass) => {
+            document.querySelector('[name="email"]').value = user;
+            document.querySelector('[name="password"]').value = pass;
+            document.querySelector("form").submit();
+        },
+        user,
+        pass
     );
+    await secretResponse(page);
 }
+
 
 async function navigateTo(url) {
     let browserInstace = await getBrowserInstance();
@@ -34,6 +37,17 @@ async function navigateTo(url) {
     return page;
 }
 
+async function secretResponse(page) {
+    await page.waitForSelector('.page-message.text-opensans', { visible: true, timeout: 0 });
+    const answer = process.env.ANSWER;
+    page.evaluate(
+        async (answer) => {
+            document.querySelector('[name="answer"]').value = answer;
+            document.querySelector("form").submit();
+        }, answer
+    );
+}
+async function goToTimePage() { }
 
 
 run()
