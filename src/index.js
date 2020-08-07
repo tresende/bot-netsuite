@@ -2,9 +2,10 @@ const puppeteer = require('puppeteer');
 require('dotenv').config()
 
 async function run() {
-    await login();
-    await secretResponse();
-    await goToTimePage();
+    let curentPage = {};
+    curentPage = await login();
+    curentPage = await secretResponse(curentPage);
+    curentPage = await goToTimePage(curentPage);
 }
 
 async function getBrowserInstance() {
@@ -26,9 +27,8 @@ async function login() {
         user,
         pass
     );
-    await secretResponse(page);
+    return page;
 }
-
 
 async function navigateTo(url) {
     let browserInstace = await getBrowserInstance();
@@ -46,6 +46,7 @@ async function secretResponse(page) {
             document.querySelector("form").submit();
         }, answer
     );
+    return page;
 }
 async function goToTimePage() { }
 
