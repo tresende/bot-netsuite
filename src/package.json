@@ -1,0 +1,11 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "Bot Para lançar horas na sexta feira",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Thiago Resende",
+  "license": "MIT"
+}
