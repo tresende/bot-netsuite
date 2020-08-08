@@ -49,7 +49,7 @@ async function secretResponse(page) {
 async function goToTimePage(page) {
     await page.waitForSelector('.ns-menu.uir-menu-main.ns-menubar', { visible: true, timeout: 0 });
     const currentPage = await navigateTo(process.env.TIME_PAGE, page);
-    copyLastWeekValues(currentPage);
+    return await copyLastWeekValues(currentPage);
 }
 
 async function copyLastWeekValues(page) {
@@ -67,6 +67,7 @@ async function copyLastWeekValues(page) {
     page.evaluate(async () => {
         document.querySelector("#btn_secondarymultibutton_submitter").click();
     });
+    return page;
 }
 
 run();
