@@ -18,21 +18,20 @@ async function login() {
     const page = await navigateTo(process.env.BASE_URL);
     const user = process.env.USER;
     const pass = process.env.PASS;
-    page.evaluate(
-        async (user, pass) => {
-            document.querySelector('[name="email"]').value = user;
-            document.querySelector('[name="password"]').value = pass;
-            document.querySelector("form").submit();
-        },
+    page.evaluate(async (user, pass) => {
+        document.querySelector('[name="email"]').value = user;
+        document.querySelector('[name="password"]').value = pass;
+        document.querySelector("form").submit();
+    },
         user,
         pass
     );
     return page;
 }
 
-async function navigateTo(url) {
+async function navigateTo(url, currentPage) {
     let browserInstace = await getBrowserInstance();
-    const page = await browserInstace.newPage();
+    const page = currentPage || await browserInstace.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
     return page;
 }
@@ -40,19 +39,34 @@ async function navigateTo(url) {
 async function secretResponse(page) {
     await page.waitForSelector('.page-message.text-opensans', { visible: true, timeout: 0 });
     const answer = process.env.ANSWER;
-    page.evaluate(
-        async (answer) => {
-            document.querySelector('[name="answer"]').value = answer;
-            document.querySelector("form").submit();
-        }, answer
-    );
+    page.evaluate(async (answer) => {
+        document.querySelector('[name="answer"]').value = answer;
+        document.querySelector("form").submit();
+    }, answer);
     return page;
 }
 
-
-async function goToTimePage() { 
+async function goToTimePage(page) {
     await page.waitForSelector('.ns-menu.uir-menu-main.ns-menubar', { visible: true, timeout: 0 });
-    return await navigateTo(process.env.TIME_PAGE);
+    const currentPage = await navigateTo(process.env.TIME_PAGE, page);
+    copyLastWeekValues(currentPage);
 }
 
-run()
+async function copyLastWeekValues(page) {
+    await page.waitForSelector('#secondarycopytimesheet', { visible: true, timeout: 0 });
+    page.evaluate(async () => {
+        document.getElementById('secondarycopytimesheet').click();
+    });
+
+    await page.waitFor(6000);
+    page.evaluate(async () => {
+        [...document.querySelectorAll('iframe')][2].contentDocument.getElementById("copy").click();
+    });
+
+    await page.waitForSelector('#timeitem_row_4', { visible: true, timeout: 0 });
+    page.evaluate(async () => {
+        document.querySelector("#btn_secondarymultibutton_submitter").click();
+    });
+}
+
+run();
