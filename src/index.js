@@ -48,7 +48,11 @@ async function secretResponse(page) {
     );
     return page;
 }
-async function goToTimePage() { }
 
+
+async function goToTimePage() { 
+    await page.waitForSelector('.ns-menu.uir-menu-main.ns-menubar', { visible: true, timeout: 0 });
+    return await navigateTo(process.env.TIME_PAGE);
+}
 
 run()
